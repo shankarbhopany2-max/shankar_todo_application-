@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}My Todo List{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+<div class="todo-container">
+    <div class="todo-header">
+        <h2>Welcome, {{ session.user_name }}!</h2>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
+    
+    <!-- Add Todo Form -->
+    <form class="add-todo-form" action="{{ url_for('add_todo') }}" method="POST">
+        <input type="text" name="title" placeholder="Add a new todo..." required />
+        <textarea name="description" placeholder="Description (optional)"></textarea>
+        <button type="submit" class="btn">Add Todo</button>
+    </form>
+    
+    <!-- Todo List -->
+    <div class="todo-list">
+        {% for todo in todos %}
+        <div class="todo-item {% if todo.completed %}completed{% endif %}">
+            <div class="todo-content">
+                <h3>{{ todo.title }}</h3>
+                {% if todo.description %}
+                <p>{{ todo.description }}</p>
+                {% endif %}
+                <small>Created: {{ todo.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+            </div>
+            <div class="todo-actions">
+                <form action="{{ url_for('update_todo', todo_id=todo.id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="action-btn complete-btn">
+                        {{ 'Undo' if todo.completed else 'Complete' }}
+                    </button>
+                </form>
+                <a href="{{ url_for('delete_todo', todo_id=todo.id) }}" class="action-btn delete-btn">Delete</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="no-todos">
+            <p>No todos yet. Add your first todo above!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
